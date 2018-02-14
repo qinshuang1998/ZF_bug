@@ -61,7 +61,7 @@ def login(message):
 					title="点击进行绑定",
 					description="检测到当前为首次操作，需要进行认证",
 					img="http://zf.qugcloud.cn/timg2.jpg",
-					url="https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx1b35b95a76735531&redirect_uri=http://zf.qugcloud.cn&response_type=code&scope=snsapi_base&state=123#wechat_redirect"
+					url="https://open.weixin.qq.com/connect/oauth2/authorize?appid=xxxxxxxxx&redirect_uri=http://zf.qugcloud.cn&response_type=code&scope=snsapi_base&state=123#wechat_redirect"
 					)
 		reply.add_article(article)
 		return reply
@@ -129,7 +129,7 @@ def score(message):
 
 def sqlfind(openid):
 	global data
-	db = MySQLdb.connect("localhost","root","moxuanmusic.520","test")
+	db = MySQLdb.connect("localhost","xxxx","xxxxxxxx","test")
 	cursor = db.cursor()
 	sql = "SELECT * FROM `weixin` WHERE `openid`='"+openid+"'"
 	cursor.execute(sql)
@@ -214,8 +214,8 @@ if __name__=="__main__":
 	sys.setdefaultencoding('utf8')
 	robot.config['HOST'] = '0.0.0.0'
 	robot.config['PORT'] = 8090
-	robot.config["APP_ID"] = "wx1b35b95a76735531"
-	robot.config["APP_SECRET"] = "d4dcc2b47ad2f232fe23c73ff674dd26"
+	robot.config["APP_ID"] = "xxxxxx"
+	robot.config["APP_SECRET"] = "xxxxxxx"
 	client = robot.client
 	call = requests.Session()
 	robot.run()
