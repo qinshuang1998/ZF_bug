@@ -9,7 +9,7 @@ import datetime
 import MySQLdb
 from PIL import Image
 
-robot = werobot.WeRoBot(token='qs717398')
+robot = werobot.WeRoBot(token='xxxxxx')
 Nyear = datetime.datetime.now().year
 Yyear = datetime.datetime.now().year-1
 Nmonth = datetime.datetime.now().month
