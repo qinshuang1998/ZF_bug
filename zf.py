@@ -7,12 +7,10 @@ import werobot
 import re
 import datetime
 import MySQLdb
+import random
 from PIL import Image
 
-robot = werobot.WeRoBot(token='xxxxxx')
-Nyear = datetime.datetime.now().year
-Yyear = datetime.datetime.now().year-1
-Nmonth = datetime.datetime.now().month
+robot = werobot.WeRoBot(token='xxxxxxxxxx')
 
 headers = {
 			'Referer': '',
@@ -46,6 +44,11 @@ def subscribe(message):
 	reply = "感谢您的关注!\n如果你想要使用我，那么完全OJBK，步骤如下:\n1.回复\"登录教务\"，初次使用需要验证绑定，绑定完成后再次输入\"登录教务\"即可\n2.回复你看到的验证码，#号结束，如\"sdfg#\"\n3.回复菜单编号来查询信息\n4.结束后务必输入\"清除会话\"，以防越权操作数据问题\n\n任何问题请联系QQ:1378860132"
 	return reply
 
+@robot.handler
+def unknown(message):
+	reply = "感谢您的关注!\n如果你想要使用我，那么完全OJBK，步骤如下:\n1.回复\"登录教务\"，初次使用需要验证绑定，绑定完成后再次输入\"登录教务\"即可\n2.回复你看到的验证码，#号结束，如\"sdfg#\"\n3.回复菜单编号来查询信息\n4.结束后务必输入\"清除会话\"，以防越权操作数据问题\n\n任何问题请联系QQ:1378860132"
+	return reply
+
 @robot.filter("登录教务")
 def login(message):
 	openid = message.source
@@ -61,7 +64,7 @@ def login(message):
 					title="点击进行绑定",
 					description="检测到当前为首次操作，需要进行认证",
 					img="http://zf.qugcloud.cn/timg2.jpg",
-					url="https://open.weixin.qq.com/connect/oauth2/authorize?appid=xxxxxxxxx&redirect_uri=http://zf.qugcloud.cn&response_type=code&scope=snsapi_base&state=123#wechat_redirect"
+					url="https://open.weixin.qq.com/connect/oauth2/authorize?appid=xxxxxxxxxx&redirect_uri=http://zf.qugcloud.cn&response_type=code&scope=snsapi_base&state=123#wechat_redirect"
 					)
 		reply.add_article(article)
 		return reply
@@ -83,25 +86,33 @@ def yz(message):
 	
 @robot.filter("1")
 def score(message):
-	xn = str(Yyear)+'-'+str(Nyear)
-	if Nmonth<7:
-		xq = '1'
-	else:
-		xq = '2'
-	try:
+	global data
+	openid = message.source
+	res = userfind(openid)
+	Nyear = datetime.datetime.now().year
+	Yyear = datetime.datetime.now().year-1
+	Nmonth = datetime.datetime.now().month
+	if res == data['UserName']:
+		xn = str(Yyear)+'-'+str(Nyear)
+		if Nmonth<6:
+			xq = '1'
+		else:
+			xq = '2'
 		info = GetScore(xn,xq)
 		onerow = xn+'\t'+'第'+xq+'学期'+'\n'
 		for i in range(1,len(info)):
 			onerow += info[i][0]+'\t'+info[i][1]+'\n'
 		reply = werobot.replies.TextReply(message=message,content=onerow)
-	except:
-		return "查询失败,可能有以下原因:\n1.验证码是否正确输入\n2.未登录或登录超时"
-	else:
 		return reply
+	else:
+		return "查询失败,可能有以下原因:\n1.验证码是否正确输入\n2.未登录或登录超时"
 
 @robot.filter("2")
 def sub(message):
-	try:
+	global data
+	openid = message.source
+	res = userfind(openid)
+	if res == data['UserName']:
 		info = GetSub()
 		table = '<!DOCTYPE html><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0"><title>课程表</title><style>table,table tr th,table tr td {border:1px solid #000000;}table {text-align:center;border-collapse:collapse;}</style></head><body><table>'
 		for element in info.children:
@@ -117,19 +128,32 @@ def sub(message):
 					url="http://zf.qugcloud.cn/table.html"
 					)
 		reply.add_article(article)
-	except:
-		return "查询失败,可能有以下原因:\n1.验证码是否正确输入\n2.未登录或登录超时"
-	else:
 		return reply
+	else:
+		return "查询失败,可能有以下原因:\n1.验证码是否正确输入\n2.未登录或登录超时"
 
 @robot.filter("清除会话")
 def score(message):
 	call.cookies.clear()
 	return "清除成功"	
 
+def userfind(openid):
+	db = MySQLdb.connect("localhost","zf","xxxxxxxxxx","zf")
+	cursor = db.cursor()
+	sql = "SELECT * FROM `weixin` WHERE `openid`='"+openid+"'"
+	cursor.execute(sql)
+	results = cursor.fetchone()
+	if results:
+		user = results[2]
+		db.close()
+		return user
+	else:
+		db.close()
+		return 'null'	
+
 def sqlfind(openid):
 	global data
-	db = MySQLdb.connect("localhost","xxxx","xxxxxxxx","test")
+	db = MySQLdb.connect("localhost","zf","xxxxxxxxxx","zf")
 	cursor = db.cursor()
 	sql = "SELECT * FROM `weixin` WHERE `openid`='"+openid+"'"
 	cursor.execute(sql)
@@ -214,10 +238,8 @@ if __name__=="__main__":
 	sys.setdefaultencoding('utf8')
 	robot.config['HOST'] = '0.0.0.0'
 	robot.config['PORT'] = 8090
-	robot.config["APP_ID"] = "xxxxxx"
-	robot.config["APP_SECRET"] = "xxxxxxx"
+	robot.config["APP_ID"] = "xxxxxxxxxx"
+	robot.config["APP_SECRET"] = "xxxxxxxxxx"
 	client = robot.client
 	call = requests.Session()
 	robot.run()
-	
-	
